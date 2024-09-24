@@ -44,7 +44,7 @@ void printArray(int arr[], int size) {
 }
 
 int main() {
-    int arr[] = {2,32,54,33,5};
+    int arr[] = {17,92,56,3,22};
     int n = sizeof(arr) / sizeof(arr[0]);
     quickSort(arr, 0, n - 1);
     cout << "Sorted array: ";
