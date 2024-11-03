@@ -97,7 +97,7 @@ int main() {
     grafo[4].push_back({7, 38.90});  // De nodo 5 a nodo 8
     grafo[7].push_back({4, 38.90});  // Bidireccional
 
-    // Verificación de conexiones
+    // verificación de conexiones - impresion en terminal
     cout << "Conexiones de cada nodo:" << endl;
     for (int i = 0; i < n; ++i) {
         cout << "Nodo " << i + 1 << ": ";
