@@ -63,7 +63,7 @@ int main() {
     vector<vector<pair<int, double>>> grafo(n);
     vector<int> previo(n, -1);
 
-    // aristas con pesos (distancias en metros) según la tabla
+    // aristas con pesos (distancias en metros)
     grafo[0].push_back({1, 82.53});
     grafo[1].push_back({0, 82.53}); // Bidireccional
 
