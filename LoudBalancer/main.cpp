@@ -1,63 +1,39 @@
 #include <iostream>
-#include <vector>
-#include <ctime>
 #include "loadbalancer.h"
 #include "loadbalancer.cpp"
 
-using namespace std;
-
 int main() {
-    srand(static_cast<unsigned int>(time(0))); // Inicializa aleatoriedad para los costos
+    int numServers, maxRequests;
 
-    int numServers;
-    cout << "Ingrese el número de servidores: ";
-    cin >> numServers;
+    std::cout << "Ingrese el número de servidores: ";
+    std::cin >> numServers;
+    std::cout << "Ingrese la carga máxima por servidor: ";
+    std::cin >> maxRequests;
 
-    vector<vector<int>> matrix(numServers, vector<int>(numServers));
-    cout << "Generando costos de conexión entre servidores aleatoriamente...\n";
+    LoadBalancer lb(numServers, maxRequests);
 
-    // Genera aleatoriamente la matriz de costos de conexión
-    for (int i = 0; i < numServers; i++) {
-        for (int j = 0; j < numServers; j++) {
-            if (i == j) {
-                matrix[i][j] = 0;  // Costo 0 para conexiones consigo mismo
-            } else {
-                matrix[i][j] = rand() % 20 + 1;  // Costo aleatorio entre 1 y 20
-            }
-        }
-    }
+    int option;
+    do {
+        std::cout << "\n1. Añadir petición\n";
+        std::cout << "2. Mostrar estado de los servidores\n";
+        std::cout << "0. Salir\n";
+        std::cout << "Seleccione una opción: ";
+        std::cin >> option;
 
-    int maxRequests;
-    cout << "Ingrese la carga máxima por servidor: ";
-    cin >> maxRequests;
-
-    loadbalancer lb(numServers, matrix, maxRequests);
-
-    int action, startServer;
-    while (true) {
-        cout << "\nOpciones:\n1. Asignar solicitud\n2. Completar solicitud\n3. Mostrar estado de servidores\n4. Salir\nOpción: ";
-        cin >> action;
-
-        switch (action) {
+        switch (option) {
             case 1:
-                cout << "Ingrese el servidor de origen para la solicitud: ";
-                cin >> startServer;
-                lb.distributeRequest(startServer);
+                lb.addRequest();
                 break;
             case 2:
-                cout << "Ingrese el servidor para completar solicitud: ";
-                cin >> startServer;
-                lb.completeRequest(startServer);
+                lb.printStatus();
                 break;
-            case 3:
-                lb.displayServerLoads();
+            case 0:
+                std::cout << "Saliendo del programa...\n";
                 break;
-            case 4:
-                return 0;
             default:
-                cout << "Opción no válida. Intente de nuevo.\n";
+                std::cout << "Opción no válida.\n";
         }
-    }
+    } while (option != 0);
 
     return 0;
 }

@@ -1,50 +1,67 @@
 #include "loadbalancer.h"
+#include <iostream>
+#include <vector>
+#include <climits>
+#include <cstdlib>
+#include <ctime>
 
-loadbalancer::loadbalancer(int n, const vector<vector<int>>& matrix, int maxRequests)
-    : numServers(n), adjMatrix(matrix), requestsPerServer(n, 0), maxRequestsPerServer(maxRequests) {}
+LoadBalancer::LoadBalancer(int numServers, int maxRequests) 
+    : numServers(numServers), maxRequests(maxRequests) {
+    serverLoad.resize(numServers, 0);
+    generateCostMatrix();
+}
 
-int loadbalancer::distributeRequest(int startServer) {
-    int minCost = INF;
-    int selectedServer = -1;
+void LoadBalancer::generateCostMatrix() {
+    srand(time(0));
+    costMatrix.resize(numServers, std::vector<int>(numServers, INT_MAX));
 
-    // Buscar el servidor con menor costo de conexión y que tenga capacidad disponible
     for (int i = 0; i < numServers; ++i) {
-        if (i != startServer && adjMatrix[startServer][i] != INF && requestsPerServer[i] < maxRequestsPerServer) {
-            if (adjMatrix[startServer][i] < minCost) {
-                minCost = adjMatrix[startServer][i];
-                selectedServer = i;
+        for (int j = 0; j < numServers; ++j) {
+            if (i != j) {
+                costMatrix[i][j] = rand() % 20 + 1; // Costos entre 1 y 20
             }
         }
     }
-
-    // Si se encontró un servidor disponible, asignar la solicitud
-    if (selectedServer != -1) {
-        requestsPerServer[selectedServer]++;
-        cout << "Solicitud asignada al Servidor " << selectedServer
-             << " desde Servidor " << startServer << ", Carga actual: "
-             << requestsPerServer[selectedServer] << "\n";
-    } else {
-        cout << "No hay servidores disponibles desde el Servidor " << startServer << "\n";
-    }
-
-    return selectedServer;
 }
 
-void loadbalancer::completeRequest(int serverId) {
-    if (serverId < 0 || serverId >= numServers || requestsPerServer[serverId] == 0) {
-        cout << "Error: no hay solicitudes activas en el Servidor " << serverId << "\n";
-        return;
-    }
+int LoadBalancer::findAvailableServer() {
+    int minCost = INT_MAX;
+    int chosenServer = -1;
 
-    requestsPerServer[serverId]--;
-    cout << "Solicitud completada en el Servidor " << serverId
-         << ", Carga actual: " << requestsPerServer[serverId] << "\n";
-}
-
-void loadbalancer::displayServerLoads() const {
-    cout << "Cargas actuales de los servidores:\n";
     for (int i = 0; i < numServers; ++i) {
-        cout << "Servidor " << i << ": " << requestsPerServer[i]
-             << " solicitudes" << (requestsPerServer[i] >= maxRequestsPerServer ? " (LLENO)" : " (DISPONIBLE)") << "\n";
+        if (serverLoad[i] < maxRequests) {
+            int totalCost = 0;
+            for (int j = 0; j < numServers; ++j) {
+                if (i != j) {
+                    totalCost += costMatrix[i][j];
+                }
+            }
+            if (totalCost < minCost) {
+                minCost = totalCost;
+                chosenServer = i;
+            }
+        }
+    }
+    return chosenServer;
+}
+
+void LoadBalancer::addRequest() {
+    int server = findAvailableServer();
+    if (server == -1) {
+        std::cout << "Todos los servidores están llenos. No se puede atender la petición.\n";
+    } else {
+        serverLoad[server]++;
+        std::cout << "Petición asignada al servidor " << server << ".\n";
+    }
+}
+
+void LoadBalancer::printStatus() {
+    std::cout << "Estado de los servidores:\n";
+    for (int i = 0; i < numServers; ++i) {
+        std::cout << "Servidor " << i << ": " << serverLoad[i]
+                  << " / " << maxRequests << " peticiones.\n";
+        if (serverLoad[i] == maxRequests) {
+            std::cout << "Servidor " << i << " está lleno.\n";
+        }
     }
 }

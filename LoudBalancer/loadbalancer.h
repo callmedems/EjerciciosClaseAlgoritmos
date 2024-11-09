@@ -2,25 +2,21 @@
 #define LOADBALANCER_H
 
 #include <vector>
-#include <iostream>
-#include <climits>
 
-using namespace std;
+class LoadBalancer {
+public:
+    LoadBalancer(int numServers, int maxRequests);
+    void addRequest();
+    void printStatus();
 
-const int INF = INT_MAX;
-
-class loadbalancer {
 private:
     int numServers;
-    vector<vector<int>> adjMatrix;
-    vector<int> requestsPerServer;
-    int maxRequestsPerServer;
+    int maxRequests;
+    std::vector<int> serverLoad;
+    std::vector<std::vector<int>> costMatrix;
 
-public:
-    loadbalancer(int n, const vector<vector<int>>& matrix, int maxRequests);
-    int distributeRequest(int startServer);
-    void completeRequest(int serverId);
-    void displayServerLoads() const;
+    void generateCostMatrix();
+    int findAvailableServer();
 };
 
-#endif // LOADBALANCER_H
+#endif
