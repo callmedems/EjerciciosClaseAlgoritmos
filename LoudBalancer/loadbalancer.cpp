@@ -7,15 +7,17 @@ int loadbalancer::distributeRequest(int startServer) {
     int minCost = INF;
     int selectedServer = -1;
 
+    // Buscar el servidor con menor costo de conexión y que tenga capacidad disponible
     for (int i = 0; i < numServers; ++i) {
         if (i != startServer && adjMatrix[startServer][i] != INF && requestsPerServer[i] < maxRequestsPerServer) {
-            if (adjMatrix[startServer][i] < minCost || (selectedServer == -1)) {
+            if (adjMatrix[startServer][i] < minCost) {
                 minCost = adjMatrix[startServer][i];
                 selectedServer = i;
             }
         }
     }
 
+    // Si se encontró un servidor disponible, asignar la solicitud
     if (selectedServer != -1) {
         requestsPerServer[selectedServer]++;
         cout << "Solicitud asignada al Servidor " << selectedServer
