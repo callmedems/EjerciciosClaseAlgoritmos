@@ -1,67 +1,54 @@
 #include "loadbalancer.h"
-#include <iostream>
-#include <vector>
-#include <climits>
-#include <cstdlib>
-#include <ctime>
 
-LoadBalancer::LoadBalancer(int numServers, int maxRequests) 
-    : numServers(numServers), maxRequests(maxRequests) {
-    serverLoad.resize(numServers, 0);
-    generateCostMatrix();
-}
+using namespace std;
 
-void LoadBalancer::generateCostMatrix() {
-    srand(time(0));
-    costMatrix.resize(numServers, std::vector<int>(numServers, INT_MAX));
+// constructor que inicializa el número de servidores, matriz de adyacencia de costos y capacidad max de peticiones por servidor
+LoadBalancer::LoadBalancer(int numServers, const vector<vector<int>>& matrix, int maxRquests)
+    : numServers(numServers), adjMatrix(matrix), maxRequests(maxRequests), requestsPerServer(numServers, 0) {}
 
+// distribuir una solicitud desde un servidor de inicio a otro servidor con menor costo y carga
+int LoadBalancer::distributeRequest(int startServer) {
+    int costoMin = INF;
+    int selectedServer = -1;
+
+    // itera para encontrar servidor óptimo
     for (int i = 0; i < numServers; ++i) {
-        for (int j = 0; j < numServers; ++j) {
-            if (i != j) {
-                costMatrix[i][j] = rand() % 20 + 1; // Costos entre 1 y 20
+        if (i != startServer && adjMatrix[startServer][i] != INF && requestsPerServer[i] < maxRequests) {
+            if ((selectedServer == -1 || requestsPerServer[i] < requestsPerServer[selectedServer]) &&
+                (adjMatrix[startServer][i] < costoMin)) {
+                costoMin = adjMatrix[startServer][i];
+                selectedServer = i;
             }
         }
     }
-}
 
-int LoadBalancer::findAvailableServer() {
-    int minCost = INT_MAX;
-    int chosenServer = -1;
-
-    for (int i = 0; i < numServers; ++i) {
-        if (serverLoad[i] < maxRequests) {
-            int totalCost = 0;
-            for (int j = 0; j < numServers; ++j) {
-                if (i != j) {
-                    totalCost += costMatrix[i][j];
-                }
-            }
-            if (totalCost < minCost) {
-                minCost = totalCost;
-                chosenServer = i;
-            }
-        }
-    }
-    return chosenServer;
-}
-
-void LoadBalancer::addRequest() {
-    int server = findAvailableServer();
-    if (server == -1) {
-        std::cout << "Todos los servidores están llenos. No se puede atender la petición.\n";
+    if (selectedServer != -1) { // se encontró un servidor disponible, incrementa su carga y muestra el mensaje
+        requestsPerServer[selectedServer]++;
+        cout << "Petición asignada al Servidor " << selectedServer
+             << " desde Servidor " << startServer << ", Carga actual: "
+             << requestsPerServer[selectedServer] << "\n";
     } else {
-        serverLoad[server]++;
-        std::cout << "Petición asignada al servidor " << server << ".\n";
+        cout << "Error: todos los servidores están llenos o no hay conexion disponible.\n";
     }
+    return selectedServer;
 }
 
-void LoadBalancer::printStatus() {
-    std::cout << "Estado de los servidores:\n";
+// completar una petición en un servidor dado
+void LoadBalancer::completeRequest(int serverId) {
+    if(serverId < 0 || serverId >= numServers || requestsPerServer[serverId] == 0) {
+        cout << "Error: no hay peticiones activas en el Servidor " << serverId << "\n";
+        return;
+    }
+
+    requestsPerServer[serverId]--;
+    cout << "Petición completada en el Servidor " << serverId
+             << ", Carga actual: " << requestsPerServer[serverId] << "\n";
+}
+
+// mostrar las cargas actuales de cada servidor
+void LoadBalancer::displayServerLoads() {
+    cout << "Cargas actuales de los servidores:\n";
     for (int i = 0; i < numServers; ++i) {
-        std::cout << "Servidor " << i << ": " << serverLoad[i]
-                  << " / " << maxRequests << " peticiones.\n";
-        if (serverLoad[i] == maxRequests) {
-            std::cout << "Servidor " << i << " está lleno.\n";
-        }
+        cout << "Servidor " << i << ": " << requestsPerServer[i] << " solicitudes\n";
     }
 }

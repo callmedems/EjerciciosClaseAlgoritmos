@@ -2,21 +2,25 @@
 #define LOADBALANCER_H
 
 #include <vector>
+#include <iostream>
+#include <climits>
 
-class LoadBalancer {
-public:
-    LoadBalancer(int numServers, int maxRequests);
-    void addRequest();
-    void printStatus();
+using namespace std;
 
-private:
-    int numServers;
-    int maxRequests;
-    std::vector<int> serverLoad;
-    std::vector<std::vector<int>> costMatrix;
+const int INF = INT_MAX; // por si no hay conexión
 
-    void generateCostMatrix();
-    int findAvailableServer();
+class LoadBalancer { //  clase LoadBalancer para gestionar la distribución de peticiones entre servidores
+    private:
+        int numServers; 
+        int maxRequests;
+        vector<vector<int>> adjMatrix; 
+        vector<int> requestsPerServer; 
+
+    public:
+        LoadBalancer(int numServers, const vector<vector<int>>& matrix, int maxRequests); 
+        int distributeRequest(int startServer); 
+        void completeRequest(int serverId);
+        void displayServerLoads(); 
 };
 
-#endif
+#endif // LOADBALANCER_H
