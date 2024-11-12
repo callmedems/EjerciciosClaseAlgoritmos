@@ -22,6 +22,7 @@ vector<vector<int>> configMatrixAdj(int numServes){
             }
         }
     }
+    return matrix;
 }
 
 
