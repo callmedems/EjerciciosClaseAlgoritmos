@@ -26,7 +26,7 @@ vector<vector<int>> configMatrixAdj(int numServes){
 
 
 int main() {
-    int numServers; 
+    int numServers;
     int maxRequests;
 
     cout << "Ingrese el número de servidores: ";
