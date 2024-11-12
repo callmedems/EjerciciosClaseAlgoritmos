@@ -7,12 +7,12 @@
 using namespace std; 
 
 // para config la matriz adyacente
-vector<vector<int>> configMatrixAdj(int numServes){
-    vector<vector<int>> matrix(numServes, vector<int>(numServes, INF)); // inicializar matriz numServers x numServers
+vector<vector<int>> configMatrixAdj(int numServers){
+    vector<vector<int>> matrix(numServers, vector<int>(numServers, INF)); // inicializar matriz numServers x numServers
     
     cout << "Configuración de costos entre servidores: " << endl;
-    for (int i = 0; i < numServes; i++) {
-        for (int j = 0; j < numServes; j++) {
+    for (int i = 0; i < numServers; i++) {
+        for (int j = i + 1; j < numServers; j++) {
             int costo; 
             cout << "Conexión entre Servidor " << i << " y Servidor " << j << " (si no hay conexión, ingrese -1): ";
             cin >> costo;
@@ -39,7 +39,7 @@ int main() {
 
     int option, startServer;
     do { // menu de opciones para usuario
-        cout << "\nSalir\n";
+        cout << "\n0. Salir\n";
         cout << "1. Añadir petición\n";
         cout << "2. Completar petición\n";
         cout << "3. Mostrar estado de los servidores\n";
@@ -51,9 +51,13 @@ int main() {
                 cout << "Saliendo del programa...\n";
                 break;
             case 1:
+                cout << "Ingrese el servidor de origen para la petición: ";
+                cin >> startServer;
                 lb.distributeRequest(startServer);
                 break;
             case 2:
+                cout << "Ingrese el servidor donde completar una petición: ";
+                cin >> startServer;
                 lb.completeRequest(startServer);
                 break;
             case 3: 
@@ -62,7 +66,7 @@ int main() {
             default:
                 cout << "Opción no válida.\n";
         }
-    } while (option != 4);
+    } while (option != 0);
 
     return 0;
 }

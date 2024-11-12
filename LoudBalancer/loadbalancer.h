@@ -17,7 +17,7 @@ class LoadBalancer { //  clase LoadBalancer para gestionar la distribución de p
         vector<int> requestsPerServer; 
 
     public:
-        LoadBalancer(int numServers, const vector<vector<int>>& matrix, int maxRequests); 
+        LoadBalancer(int n, const vector<vector<int>>& matrix, int maxRequests); 
         int distributeRequest(int startServer); 
         void completeRequest(int serverId);
         void displayServerLoads(); 
