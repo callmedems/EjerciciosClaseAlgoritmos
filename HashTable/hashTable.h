@@ -1,29 +1,31 @@
 #ifndef HASHTABLE_H
 #define HASHTABLE_H
 
-#include <iostream>
-#include <list>
 #include <vector>
+#include <optional>
 
-using namespace std;
+enum CollisionResolution { LINEAR_PROBING, QUADRATIC_PROBING };
 
 class HashTable {
 private:
-    vector<list<int>> table;
-    int tableSize;
+    int size;                           // Tamaño de la tabla
+    std::vector<std::optional<int>> table; // Tabla que almacena claves
+    int numElements;                    // Número de elementos en la tabla
+    CollisionResolution collisionResolutionMethod; // Método de resolución de colisiones
 
-    // Función de hash que utiliza el operador módulo
-    int hashFunction(int key) const;
+    int hashFunction(int key);
+    int probeLinear(int hash, int i);
+    int probeQuadratic(int hash, int i);
+    void rehash();
+    int resolve(int hash, int i, int currentSize = -1);
 
 public:
-    // Constructor
-    HashTable(int size);
+    HashTable(int tableSize, CollisionResolution method);
 
-    // Métodos de la tabla hash
     void insert(int key);
-    bool search(int key) const;
+    bool search(int key);
     void remove(int key);
-    void display() const;
+    void display();
 };
 
 #endif // HASHTABLE_H
